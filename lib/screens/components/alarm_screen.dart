@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:clock_light_dark/screens/components/time_picker_dialog.dart';
 import 'package:audioplayers/audioplayers.dart';
 import 'dart:async';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class AlarmScreen extends StatefulWidget {
   const AlarmScreen({super.key});
@@ -37,7 +38,10 @@ class _AlarmScreenState extends State<AlarmScreen> {
               onPressed: () {
                 Navigator.of(context).pop();
               },
-              child: const Text('Hủy'),
+              child: Text('Hủy',
+                style: TextStyle(
+                    color: Colors.grey[400], fontWeight: FontWeight.bold),
+              ),
             ),
             TextButton(
               onPressed: () {
@@ -49,7 +53,10 @@ class _AlarmScreenState extends State<AlarmScreen> {
                 }
                 Navigator.of(context).pop();
               },
-              child: const Text('Lưu'),
+              child: Text('Lưu',
+                  style: TextStyle(
+                      color: Colors.amber[800], fontWeight: FontWeight.bold)
+              ),
             ),
           ],
         );
@@ -80,15 +87,19 @@ class _AlarmScreenState extends State<AlarmScreen> {
       barrierDismissible: false,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: const Text('Báo thức'),
-          content: const Text('Dậy đi con đĩ mẹ!'),
+          title: Text('Báo thức',
+              style: TextStyle(
+                  color: Colors.blueGrey[200], fontWeight: FontWeight.w200)),
+          content: Text('Dậy đi!', style: TextStyle(
+              color: Colors.amber[800], fontWeight: FontWeight.bold, fontSize: 64)),
           actions: [
             TextButton(
               onPressed: () {
                 _stopAlarmSound();
                 Navigator.of(context).pop();
               },
-              child: const Text('Cút'),
+              child: Text('Tắt', style: TextStyle(
+                  color: Colors.amber[400], fontWeight: FontWeight.bold)),
             ),
           ],
         );
@@ -125,25 +136,34 @@ class _AlarmScreenState extends State<AlarmScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Báo thức'),
+        title: Text('Báo thức',
+            style: TextStyle(
+                color: Colors.amber[800], fontWeight: FontWeight.bold)),
       ),
       body: ListView.builder(
         itemCount: _alarms.length,
         itemBuilder: (context, index) {
           final alarm = _alarms[index];
-          return ListTile(
-            title: Text(alarm.time.format(context)),
-            trailing: IconButton(
-              icon: const Icon(Icons.delete),
-              onPressed: () {
-                if (mounted) {
-                  setState(() {
-                    _alarms.removeAt(index);
-                  });
-                }
-              },
+          return Card(
+            shape: RoundedRectangleBorder(
+              side: BorderSide(color: Colors.grey, width: 0.1),
+              borderRadius: BorderRadius.circular(10),
             ),
-          );
+            child: ListTile(
+              title: Text(alarm.time.format(context), style: TextStyle(
+                  color: Colors.amber[400])),
+              trailing: IconButton(
+                icon: Icon(Icons.delete, color: Colors.orange[400]),
+                onPressed: () {
+                  if (mounted) {
+                    setState(() {
+                      _alarms.removeAt(index);
+                    });
+                  }
+                },
+              ),
+            ),
+        );
         },
       ),
       floatingActionButton: FloatingActionButton(
