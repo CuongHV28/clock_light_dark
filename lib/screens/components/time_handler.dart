@@ -11,6 +11,8 @@ class TimeHandler extends StatefulWidget {
 
 class _TimeHandlerState extends State<TimeHandler> {
   TimeOfDay _timeOfDay = TimeOfDay.now();
+  Timer? _timer;
+
   @override
   void initState() {
     super.initState();
@@ -25,6 +27,7 @@ class _TimeHandlerState extends State<TimeHandler> {
 
   @override
   void dispose() {
+    _timer?.cancel();
     super.dispose();
   }
 

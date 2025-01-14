@@ -1,10 +1,34 @@
+import 'package:clock_light_dark/screens/components/alarm_screen.dart';
+import 'package:clock_light_dark/screens/components/stopwatch_screen.dart';
+import 'package:clock_light_dark/screens/components/timer_screen.dart';
 import 'components/clock_container.dart';
 import '../size_config.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 
-class HomeScreenWidget extends StatelessWidget {
+class HomeScreenWidget extends StatefulWidget {
   const HomeScreenWidget({super.key});
+
+  @override
+  // ignore: library_private_types_in_public_api
+  _HomeScreenWidgetState createState() => _HomeScreenWidgetState();
+}
+
+class _HomeScreenWidgetState extends State<HomeScreenWidget> {
+  int _selectedIndex = 0;
+
+  static const List<Widget> _widgetOptions = <Widget>[
+    ClockContainer(),
+    AlarmScreen(),
+    TimerScreen(),
+    StopwatchScreen(),
+  ];
+
+  void _onItemTapped(int index) {
+    setState(() {
+      _selectedIndex = index;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -12,7 +36,31 @@ class HomeScreenWidget extends StatelessWidget {
     SizeConfig().init(context);
     return Scaffold(
       appBar: buildAppBar(context),
-      body: const ClockContainer(),
+      body: _widgetOptions.elementAt(_selectedIndex),
+      bottomNavigationBar: BottomNavigationBar(
+        items: const <BottomNavigationBarItem>[
+          BottomNavigationBarItem(
+            icon: Icon(Icons.access_time),
+            label: 'Clock',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.alarm),
+            label: 'Alarms',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.timer),
+            label: 'Timer',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.timer),
+            label: 'Stopwatch',
+          ),
+        ],
+        currentIndex: _selectedIndex,
+        selectedItemColor: Colors.amber[800],
+        unselectedItemColor: Colors.amberAccent[200],
+        onTap: _onItemTapped,
+      ),
     );
   }
 
@@ -24,28 +72,6 @@ class HomeScreenWidget extends StatelessWidget {
           // color: Theme.of(context).iconTheme.color,
         ),
         onPressed: () {},
-      ),
-      actions: [buildAddButton(context)],
-    );
-  }
-
-  Padding buildAddButton(BuildContext context) {
-    return Padding(
-      padding:
-          EdgeInsets.symmetric(horizontal: getProportionateScreenWidth(10)),
-      child: InkWell(
-        onTap: () {},
-        child: Container(
-          width: getProportionateScreenWidth(32),
-          decoration: BoxDecoration(
-            color: Theme.of(context).primaryColor,
-            shape: BoxShape.circle,
-          ),
-          child: const Icon(
-            Icons.add,
-            color: Colors.white,
-          ),
-        ),
       ),
     );
   }
