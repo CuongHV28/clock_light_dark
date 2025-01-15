@@ -1,10 +1,11 @@
-import 'package:clock_light_dark/models/custom_theme_provider.dart';
-import 'package:clock_light_dark/screens/home_view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:provider/provider.dart';
 import 'theme.dart';
 import 'package:timezone/data/latest.dart' as tz;
+import 'package:timezone/timezone.dart' as tz;
+import 'models/custom_theme_provider.dart';
+import 'screens/home_view.dart';
 
 final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
     FlutterLocalNotificationsPlugin();

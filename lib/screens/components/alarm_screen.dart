@@ -3,9 +3,14 @@ import 'package:clock_light_dark/screens/components/time_picker_dialog.dart';
 import 'package:audioplayers/audioplayers.dart';
 import 'dart:async';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:timezone/timezone.dart' as tz;
+import '../../main.dart';
 
 class AlarmScreen extends StatefulWidget {
-  const AlarmScreen({super.key});
+  final String? alarmTime;
+
+  const AlarmScreen({super.key, this.alarmTime});
 
   @override
   _AlarmScreenState createState() => _AlarmScreenState();
@@ -17,6 +22,38 @@ class _AlarmScreenState extends State<AlarmScreen> {
   Timer? _alarmTimer;
   Timer? _soundTimer;
   int _soundDuration = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadAlarms();
+    if (widget.alarmTime != null) {
+      _showAlarmDialog(widget.alarmTime!);
+    }
+  }
+
+  void _loadAlarms() async {
+    final prefs = await SharedPreferences.getInstance();
+    final alarmTimes = prefs.getStringList('alarms') ?? [];
+    setState(() {
+      _alarms.addAll(alarmTimes.map((time) => Alarm(
+              time: TimeOfDay(
+            hour: int.parse(time.split(':')[0]),
+            minute: int.parse(time.split(':')[1]),
+          ))));
+    });
+    for (var alarm in _alarms) {
+      _scheduleAlarm(alarm.time);
+    }
+  }
+
+  void _saveAlarms() async {
+    final prefs = await SharedPreferences.getInstance();
+    final alarmTimes = _alarms
+        .map((alarm) => '${alarm.time.hour}:${alarm.time.minute}')
+        .toList();
+    prefs.setStringList('alarms', alarmTimes);
+  }
 
   void _addAlarm() {
     showDialog(
@@ -38,7 +75,8 @@ class _AlarmScreenState extends State<AlarmScreen> {
               onPressed: () {
                 Navigator.of(context).pop();
               },
-              child: Text('Hủy',
+              child: Text(
+                'Hủy',
                 style: TextStyle(
                     color: Colors.grey[400], fontWeight: FontWeight.bold),
               ),
@@ -47,16 +85,17 @@ class _AlarmScreenState extends State<AlarmScreen> {
               onPressed: () {
                 if (mounted) {
                   setState(() {
-                    _alarms.add(Alarm(time: selectedTime));
+                    final newAlarm = Alarm(time: selectedTime);
+                    _alarms.add(newAlarm);
                     _scheduleAlarm(selectedTime);
+                    _saveAlarms();
                   });
                 }
                 Navigator.of(context).pop();
               },
               child: Text('Lưu',
                   style: TextStyle(
-                      color: Colors.amber[800], fontWeight: FontWeight.bold)
-              ),
+                      color: Colors.amber[800], fontWeight: FontWeight.bold)),
             ),
           ],
         );
@@ -78,6 +117,34 @@ class _AlarmScreenState extends State<AlarmScreen> {
     } else {
       _alarmTimer = Timer(duration, _showAlarm);
     }
+
+    final tzScheduledDate = tz.TZDateTime.from(scheduledDate, tz.local);
+    const AndroidNotificationDetails androidPlatformChannelSpecifics =
+        AndroidNotificationDetails(
+      'alarm_channel',
+      'Alarm Channel',
+      channelDescription: 'Channel for Alarm notifications',
+      importance: Importance.max,
+      priority: Priority.high,
+      sound: RawResourceAndroidNotificationSound('alarm_sound'),
+      playSound: true,
+      enableVibration: true,
+    );
+    const NotificationDetails platformChannelSpecifics =
+        NotificationDetails(android: androidPlatformChannelSpecifics);
+
+    flutterLocalNotificationsPlugin.zonedSchedule(
+      0,
+      'Alarm',
+      'Your alarm is ringing',
+      tzScheduledDate,
+      platformChannelSpecifics,
+      uiLocalNotificationDateInterpretation:
+          UILocalNotificationDateInterpretation.absoluteTime,
+      matchDateTimeComponents: DateTimeComponents.time,
+      androidScheduleMode: AndroidScheduleMode.exact,
+      payload: '${time.hour}:${time.minute}',
+    );
   }
 
   void _showAlarm() {
@@ -90,16 +157,49 @@ class _AlarmScreenState extends State<AlarmScreen> {
           title: Text('Báo thức',
               style: TextStyle(
                   color: Colors.blueGrey[200], fontWeight: FontWeight.w200)),
-          content: Text('Dậy đi!', style: TextStyle(
-              color: Colors.amber[800], fontWeight: FontWeight.bold, fontSize: 64)),
+          content: Text('Dậy đi!',
+              style: TextStyle(
+                  color: Colors.amber[800],
+                  fontWeight: FontWeight.bold,
+                  fontSize: 64)),
           actions: [
             TextButton(
               onPressed: () {
                 _stopAlarmSound();
                 Navigator.of(context).pop();
               },
-              child: Text('Tắt', style: TextStyle(
-                  color: Colors.amber[400], fontWeight: FontWeight.bold)),
+              child: Text('Tắt',
+                  style: TextStyle(
+                      color: Colors.amber[400], fontWeight: FontWeight.bold)),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _showAlarmDialog(String alarmTime) {
+    _playAlarmSound();
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Báo thức'),
+          content: Text('Dậy đi!',
+              style: TextStyle(
+                  color: Colors.amber[800],
+                  fontWeight: FontWeight.bold,
+                  fontSize: 64)),
+          actions: [
+            TextButton(
+              onPressed: () {
+                _stopAlarmSound();
+                Navigator.of(context).pop();
+              },
+              child: Text('Tắt',
+                  style: TextStyle(
+                      color: Colors.amber[400], fontWeight: FontWeight.bold)),
             ),
           ],
         );
@@ -150,20 +250,21 @@ class _AlarmScreenState extends State<AlarmScreen> {
               borderRadius: BorderRadius.circular(10),
             ),
             child: ListTile(
-              title: Text(alarm.time.format(context), style: TextStyle(
-                  color: Colors.amber[400])),
+              title: Text(alarm.time.format(context),
+                  style: TextStyle(color: Colors.amber[400])),
               trailing: IconButton(
                 icon: Icon(Icons.delete, color: Colors.orange[400]),
                 onPressed: () {
                   if (mounted) {
                     setState(() {
                       _alarms.removeAt(index);
+                      _saveAlarms();
                     });
                   }
                 },
               ),
             ),
-        );
+          );
         },
       ),
       floatingActionButton: FloatingActionButton(
