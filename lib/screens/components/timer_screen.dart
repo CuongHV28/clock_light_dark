@@ -47,7 +47,9 @@ class _TimerScreenState extends State<TimerScreen> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text('Pick Time'),
+          title: Text('Chọn thời gian',
+              style: TextStyle(
+                  color: Colors.blueGrey[200], fontWeight: FontWeight.w200)),
           content: MyTimePickerDialog(
             initialTime: selectedTime,
             onTimeChanged: (TimeOfDay time) {
@@ -60,7 +62,11 @@ class _TimerScreenState extends State<TimerScreen> {
               onPressed: () {
                 Navigator.of(context).pop();
               },
-              child: const Text('Cancel'),
+              child: Text(
+                'Hủy',
+                style: TextStyle(
+                    color: Colors.grey[400], fontWeight: FontWeight.bold),
+              ),
             ),
             TextButton(
               onPressed: () {
@@ -70,7 +76,9 @@ class _TimerScreenState extends State<TimerScreen> {
                 });
                 Navigator.of(context).pop();
               },
-              child: const Text('Set'),
+              child: Text('Lưu',
+                  style: TextStyle(
+                      color: Colors.amber[800], fontWeight: FontWeight.bold)),
             ),
           ],
         );

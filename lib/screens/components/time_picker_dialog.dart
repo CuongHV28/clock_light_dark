@@ -3,7 +3,7 @@ import 'package:time_picker_spinner/time_picker_spinner.dart';
 
 enum TimePickerMode { alarm, timer }
 
-const defaultStartTime = 15;
+const defaultStartTime = 1;
 
 class MyTimePickerDialog extends StatefulWidget {
   final TimeOfDay initialTime;
