@@ -69,6 +69,7 @@ class _AlarmScreenState extends State<AlarmScreen> {
             onTimeChanged: (TimeOfDay time) {
               selectedTime = time;
             },
+            mode: TimePickerMode.alarm,
           ),
           actions: [
             TextButton(
