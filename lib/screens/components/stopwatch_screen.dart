@@ -21,7 +21,11 @@ class _StopwatchScreenState extends State<StopwatchScreen> {
   void _startStopwatch() {
     _stopwatch.start();
     _timer = Timer.periodic(Duration(milliseconds: 100), (timer) {
-      setState(() {});
+      if (mounted) {
+        setState(() {});
+      } else {
+        _timer?.cancel();
+      }
     });
   }
 

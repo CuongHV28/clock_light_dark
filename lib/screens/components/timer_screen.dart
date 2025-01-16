@@ -14,17 +14,18 @@ class _TimerScreenState extends State<TimerScreen> {
   int _start = 60; // Set the initial timer value (in seconds)
 
   void startTimer() {
-    if (_timer != null) {
-      _timer!.cancel();
-    }
     _timer = Timer.periodic(Duration(seconds: 1), (timer) {
-      setState(() {
-        if (_start > 0) {
-          _start--;
-        } else {
-          _timer!.cancel();
-        }
-      });
+      if (mounted) {
+        setState(() {
+          if (_start > 0) {
+            _start--;
+          } else {
+            _timer?.cancel();
+          }
+        });
+      } else {
+        _timer?.cancel();
+      }
     });
   }
 
