@@ -3,7 +3,7 @@ import Flutter
 import UserNotifications
 
 @UIApplicationMain
-@objc class AppDelegate: FlutterAppDelegate, UNUserNotificationCenterDelegate {
+@objc class AppDelegate: FlutterAppDelegate {
     override func application(
         _ application: UIApplication,
         didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?
@@ -23,16 +23,17 @@ import UserNotifications
         return super.application(application, didFinishLaunchingWithOptions: launchOptions)
     }
 
-    func userNotificationCenter(_ center: UNUserNotificationCenter, willPresent notification: UNNotification, withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void) {
+    override func userNotificationCenter(_ center: UNUserNotificationCenter, willPresent notification: UNNotification, withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void) {
         completionHandler([.alert, .sound])
     }
 
-    func userNotificationCenter(_ center: UNUserNotificationCenter, didReceive response: UNNotificationResponse, withCompletionHandler completionHandler: @escaping () -> Void) {
+    override func userNotificationCenter(_ center: UNUserNotificationCenter, didReceive response: UNNotificationResponse, withCompletionHandler completionHandler: @escaping () -> Void) {
         let userInfo = response.notification.request.content.userInfo
         if let alarmMessage = userInfo["ALARM_MESSAGE"] as? String {
             // Handle notification tap
             let flutterViewController = window?.rootViewController as! FlutterViewController
-            flutterViewController.invokeMethod("showAlarmDialog", arguments: alarmMessage)
+            let methodChannel = FlutterMethodChannel(name: "com.example.channel", binaryMessenger: flutterViewController.binaryMessenger)
+            methodChannel.invokeMethod("showAlarmDialog", arguments: alarmMessage)
         }
         completionHandler()
     }

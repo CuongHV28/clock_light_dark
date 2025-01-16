@@ -105,7 +105,7 @@ class _TimerScreenState extends State<TimerScreen> {
       appBar: AppBar(
         title: Text('Hẹn giờ',
             style: TextStyle(
-                color: Colors.blueGrey[200], fontWeight: FontWeight.w200)),
+                color: Colors.amber[800], fontWeight: FontWeight.bold)),
       ),
       body: Center(
         child: Column(
