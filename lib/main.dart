@@ -21,11 +21,11 @@ void main() {
   const AndroidInitializationSettings initializationSettingsAndroid =
       AndroidInitializationSettings('@mipmap/ic_launcher');
 
-  final DarwinInitializationSettings initializationSettingsDarwin = DarwinInitializationSettings(
+  final DarwinInitializationSettings initializationSettingsDarwin =
+      DarwinInitializationSettings(
     requestAlertPermission: true,
     requestBadgePermission: true,
     requestSoundPermission: true,
-    
   );
 
   final InitializationSettings initializationSettings = InitializationSettings(
@@ -33,7 +33,6 @@ void main() {
     iOS: initializationSettingsDarwin,
   );
 
-  
   flutterLocalNotificationsPlugin.initialize(initializationSettings);
 
   runApp(const MainApp());
@@ -57,12 +56,17 @@ class MainApp extends StatelessWidget {
         '/timer': (context) => const TimerScreen(),
         '/stopwatch': (context) => const StopwatchScreen(),
       },
+      builder: (context, child) {
+        NavigationHandler.initialize(context);
+        return child!;
+      },
     );
   }
 }
 
 class NavigationHandler {
-  static const platform = MethodChannel('com.thotx.clock-dark-light/navigation');
+  static const platform =
+      MethodChannel('com.thotx.clock-dark-light/navigation');
 
   static void initialize(BuildContext context) {
     platform.setMethodCallHandler((call) async {
