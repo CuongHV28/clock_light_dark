@@ -78,6 +78,8 @@ import UserNotifications
     override func userNotificationCenter(_ center: UNUserNotificationCenter, didReceive response: UNNotificationResponse, withCompletionHandler completionHandler: @escaping () -> Void) {
         let userInfo = response.notification.request.content.userInfo
         if let viewPath = userInfo["view_path"] as? String {
+
+             showAlert(viewPath: viewPath)
             // Pass the view_path to Flutter
             let flutterViewController = window?.rootViewController as! FlutterViewController
             let methodChannel = FlutterMethodChannel(name: "com.thotx.clock-dark-light/navigation", binaryMessenger: flutterViewController.binaryMessenger)
@@ -86,4 +88,10 @@ import UserNotifications
         completionHandler()
     }
     
+    
+    func showAlert(viewPath: String) {
+        let alert = UIAlertController(title: "View Path", message: viewPath, preferredStyle: .alert)
+        alert.addAction(UIAlertAction(title: "OK", style: .default, handler: nil))
+        window?.rootViewController?.present(alert, animated: true, completion: nil)
+    }
 }
