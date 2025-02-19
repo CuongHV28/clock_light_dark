@@ -72,8 +72,30 @@ class NavigationHandler {
     platform.setMethodCallHandler((call) async {
       if (call.method == 'navigateTo') {
         final viewPath = call.arguments as String;
-        Navigator.pushNamed(context, viewPath);
+        _showAlert(context, viewPath);
+        // Navigator.pushNamed(context, viewPath);
       }
     });
+  }
+
+  static void _showAlert(BuildContext context, String viewPath) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('View Path Received'),
+          content: Text('In the app now, View Path: $viewPath'),
+          actions: <Widget>[
+            TextButton(
+              child: Text('OK'),
+              onPressed: () {
+                Navigator.of(context).pop();
+                Navigator.pushNamed(context, viewPath);
+              },
+            ),
+          ],
+        );
+      },
+    );
   }
 }

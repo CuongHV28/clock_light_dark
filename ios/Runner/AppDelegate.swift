@@ -79,8 +79,12 @@ import UserNotifications
         let userInfo = response.notification.request.content.userInfo
         if let viewPath = userInfo["view_path"] as? String {
 
-             showAlert(viewPath: viewPath)s
+            // showAlert(viewPath: viewPath)
             // Pass the view_path to Flutter
+            // let flutterViewController = window?.rootViewController as! FlutterViewController
+            // let methodChannel = FlutterMethodChannel(name: "com.thotx.clock-dark-light/navigation", binaryMessenger: flutterViewController.binaryMessenger)
+            // methodChannel.invokeMethod("navigateTo", arguments: viewPath)
+
             let flutterViewController = window?.rootViewController as! FlutterViewController
             let methodChannel = FlutterMethodChannel(name: "com.thotx.clock-dark-light/navigation", binaryMessenger: flutterViewController.binaryMessenger)
             methodChannel.invokeMethod("navigateTo", arguments: viewPath)
