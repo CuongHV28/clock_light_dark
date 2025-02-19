@@ -41,8 +41,18 @@ void main() {
 class MainApp extends StatelessWidget {
   const MainApp({Key? key}) : super(key: key);
 
+  static const platform =
+      MethodChannel('com.thotx.clock-dark-light/navigation');
+
   @override
   Widget build(BuildContext context) {
+    platform.setMethodCallHandler((call) async {
+      if (call.method == 'navigateTo') {
+        final viewPath = call.arguments as String;
+        _showAlert(context, viewPath);
+      }
+    });
+
     return MaterialApp(
       title: 'Clock Light Dark',
       theme: ThemeData(
@@ -56,27 +66,7 @@ class MainApp extends StatelessWidget {
         '/timer': (context) => const TimerScreen(),
         '/stopwatch': (context) => const StopwatchScreen(),
       },
-      builder: (context, child) {
-        NavigationHandler.initialize(context);
-        return child!;
-      },
     );
-  }
-}
-
-class NavigationHandler {
-  static const platform =
-      MethodChannel('com.thotx.clock-dark-light/navigation');
-
-  static void initialize(BuildContext context) {
-    platform.setMethodCallHandler((call) async {
-      _showAlert(context, "/timer");
-      // if (call.method == 'navigateTo') {
-      //   final viewPath = call.arguments as String;
-      //   _showAlert(context, viewPath);
-      //   // Navigator.pushNamed(context, viewPath);
-      // }
-    });
   }
 
   static void _showAlert(BuildContext context, String viewPath) {
