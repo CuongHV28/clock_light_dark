@@ -70,11 +70,12 @@ class NavigationHandler {
 
   static void initialize(BuildContext context) {
     platform.setMethodCallHandler((call) async {
-      if (call.method == 'navigateTo') {
-        final viewPath = call.arguments as String;
-        _showAlert(context, viewPath);
-        // Navigator.pushNamed(context, viewPath);
-      }
+      _showAlert(context, "/timer");
+      // if (call.method == 'navigateTo') {
+      //   final viewPath = call.arguments as String;
+      //   _showAlert(context, viewPath);
+      //   // Navigator.pushNamed(context, viewPath);
+      // }
     });
   }
 
@@ -84,7 +85,8 @@ class NavigationHandler {
       builder: (BuildContext context) {
         return AlertDialog(
           title: Text('View Path Received'),
-          content: Text('In the app now, View Path: $viewPath'),
+          content: Text(
+              'In the app now, prepare to redirect to viewPath: $viewPath'),
           actions: <Widget>[
             TextButton(
               child: Text('OK'),
