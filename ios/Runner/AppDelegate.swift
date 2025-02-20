@@ -2,7 +2,7 @@ import UIKit
 import Flutter
 import UserNotifications
 
-@UIApplicationMain
+@main
 @objc class AppDelegate: FlutterAppDelegate {
     override func application(
         _ application: UIApplication,
@@ -69,81 +69,26 @@ import UserNotifications
         print("Failed to register: \(error)")
     }
     
-    /// Handle foreground notification
+    // Handle foreground notification
     override func userNotificationCenter(_ center: UNUserNotificationCenter, willPresent notification: UNNotification, withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void) {
         completionHandler([.banner, .sound, .badge])
     }
     
     // Handle background notification
-    // override func userNotificationCenter(_ center: UNUserNotificationCenter, didReceive response: UNNotificationResponse, withCompletionHandler completionHandler: @escaping () -> Void) {
-    //     let userInfo = response.notification.request.content.userInfo
-    //     if let viewPath = userInfo["view_path"] as? String {
-
-    //         // showAlert(viewPath: viewPath)
-    //         // Pass the view_path to Flutter
-    //         // let flutterViewController = window?.rootViewController as! FlutterViewController
-    //         // let methodChannel = FlutterMethodChannel(name: "com.thotx.clock-dark-light/navigation", binaryMessenger: flutterViewController.binaryMessenger)
-    //         // methodChannel.invokeMethod("navigateTo", arguments: viewPath)
-
-    //         let flutterViewController = window?.rootViewController as! FlutterViewController
-    //         let methodChannel = FlutterMethodChannel(name: "com.thotx.clock-dark-light/navigation", binaryMessenger: flutterViewController.binaryMessenger)
-    //         methodChannel.invokeMethod("navigateTo", arguments: viewPath)
-    //     }
-    //     completionHandler()
-    // }
     override func userNotificationCenter(_ center: UNUserNotificationCenter, didReceive response: UNNotificationResponse, withCompletionHandler completionHandler: @escaping () -> Void) {
         let userInfo = response.notification.request.content.userInfo
         
         if let viewPath = userInfo["view_path"] as? String {
-            // Show native iOS alert first
-            DispatchQueue.main.async {
-                let alert = UIAlertController(
-                    title: "iOS Alert",
-                    message: "About to send viewPath to Flutter: \(viewPath)",
-                    preferredStyle: .alert
+            print("Received view_path: \(viewPath)")
+            if let flutterViewController = self.window?.rootViewController as? FlutterViewController {
+                let methodChannel = FlutterMethodChannel(
+                    name: "com.thotx.clock-dark-light/navigation",
+                    binaryMessenger: flutterViewController.binaryMessenger
                 )
-                alert.addAction(UIAlertAction(title: "OK", style: .default))
-                self.window?.rootViewController?.present(alert, animated: true)
-            }
-            
-            // Then try to send to Flutter
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                if let flutterViewController = self.window?.rootViewController as? FlutterViewController {
-                    let methodChannel = FlutterMethodChannel(
-                        name: "com.thotx.clock-dark-light/navigation",
-                        binaryMessenger: flutterViewController.binaryMessenger
-                    )
-                    
-                    // Show second alert if FlutterViewController is found
-                    let channelAlert = UIAlertController(
-                        title: "MethodChannel Status",
-                        message: "MethodChannel created successfully!",
-                        preferredStyle: .alert
-                    )
-                    channelAlert.addAction(UIAlertAction(title: "OK", style: .default))
-                    self.window?.rootViewController?.present(channelAlert, animated: true)
-                    
-                    methodChannel.invokeMethod("navigateTo", arguments: viewPath)
-                } else {
-                    // Show error alert if FlutterViewController is missing
-                    let errorAlert = UIAlertController(
-                        title: "Error",
-                        message: "Failed to get FlutterViewController",
-                        preferredStyle: .alert
-                    )
-                    errorAlert.addAction(UIAlertAction(title: "OK", style: .destructive))
-                    self.window?.rootViewController?.present(errorAlert, animated: true)
-                }
+                methodChannel.invokeMethod("navigateTo", arguments: viewPath)
             }
         }
         
         completionHandler()
-    }
-    
-    
-    func showAlert(viewPath: String) {
-        let alert = UIAlertController(title: "View Path", message: viewPath, preferredStyle: .alert)
-        alert.addAction(UIAlertAction(title: "OK", style: .default, handler: nil))
-        window?.rootViewController?.present(alert, animated: true, completion: nil)
     }
 }

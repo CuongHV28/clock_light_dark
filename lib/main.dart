@@ -41,18 +41,8 @@ void main() {
 class MainApp extends StatelessWidget {
   const MainApp({Key? key}) : super(key: key);
 
-  static const platform =
-      MethodChannel('com.thotx.clock-dark-light/navigation');
-
   @override
   Widget build(BuildContext context) {
-    platform.setMethodCallHandler((call) async {
-      if (call.method == 'navigateTo') {
-        final viewPath = call.arguments as String;
-        _showAlert(context, viewPath);
-      }
-    });
-
     return MaterialApp(
       title: 'Clock Light Dark',
       theme: ThemeData(
@@ -65,28 +55,6 @@ class MainApp extends StatelessWidget {
         '/alarms': (context) => const AlarmScreen(),
         '/timer': (context) => const TimerScreen(),
         '/stopwatch': (context) => const StopwatchScreen(),
-      },
-    );
-  }
-
-  static void _showAlert(BuildContext context, String viewPath) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text('View Path Received'),
-          content: Text(
-              'In the app now, prepare to redirect to viewPath: $viewPath'),
-          actions: <Widget>[
-            TextButton(
-              child: Text('OK'),
-              onPressed: () {
-                Navigator.of(context).pop();
-                Navigator.pushNamed(context, viewPath);
-              },
-            ),
-          ],
-        );
       },
     );
   }

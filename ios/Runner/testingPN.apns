@@ -1,0 +1,11 @@
+{
+  "aps": {
+    "alert": {
+      "title": "Test Notification",
+      "body": "This is a test notification"
+    },
+    "sound": "default"
+  },
+  "view_path": "/timer",
+  "Simulator Target Bundle": "com.thotx.clock-dark-light"
+}
